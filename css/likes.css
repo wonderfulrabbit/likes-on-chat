@@ -1,10 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@700&display=swap');
+
+.position-abs{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+
+.message-box{
+	width: 500px;
+	height: 200px;
+	overflow: hidden;
+	
+}
+
+.message-box .message-box-content{
+	width: 500px;
+	height: 200px;
+	overflow: hidden;
+	animation: anime 1s 0s;
+}
+
+@keyframes anime {
+	0% {
+		width: 0px;
+		height: 200px;
+	}
+	100% {
+		width: 500px;
+		height: 200px;
+	}
+}	
+
+.message-box .title{
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 100px;
+	color: yellow;
+	text-align: center;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black;
+	text-shadow: 0 0 10px black;
+	font-family: 'Balsamiq Sans', cursive;
+}
+
+.message-box .subtitle{
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 30px;
+	color: white;
+	text-align: center;
+	webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: black;
+	text-shadow: 0 0 10px black;
+}
+
 .f-h{
 	display: flex;
 	gap: 8px;
 }
 
+.f-v{
+	display: flex;
+	flex-direction: column;
+	gap: 0px;
+}
+
 .f-end{
 	justify-content: end;
+}
+
+.f-center {
+	justify-content:center;
 }
 
 .f-a-center{

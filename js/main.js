@@ -1,47 +1,12 @@
-const resource = "data.resources.tertiary";
+import { populate_settings } from "./settings.js";
+import { create_sockets } from "./sockets.js";
 
 Hooks.once('init', () => {
-	game.settings.register("likes-on-chat", "auto_like", {
-	  name: "Auto likes",
-	  hint: "Can you like your own messages?",
-	  scope: "world",
-	  config: true,
-	  type: String,
-	  choices: {
-	    "a": "True",
-	    "b": "False"
-	  },
-	  default: "b",
-	});
-
-	game.settings.register("likes-on-chat", "change_resource_of_actor", {
-	  name: "Change resource of actor",
-	  hint: "Does it change the resource of the actor receiving likes?",
-	  scope: "world",
-	  config: true,
-	  type: String,
-	  choices: {
-	    "a": "True",
-	    "b": "False"
-	  },
-	  default: "a"
-	});
-
-	game.settings.register("likes-on-chat", "resource", {
-	  name: "Resource to change",
-	  scope: "world",
-	  config: true,
-	  type: String,
-	  default: "data.resources.tertiary"
-	});
-
-	game.socket.on('module.likes-on-chat', (data) => {
-		if (data.operation == "change-likes-chat") handle_change_chat(data);
-		if (data.operation == "change-likes-user") handle_change_user(data);
-		if (data.operation == "change-actor-data") handle_change_actor(data);
-	});
+	populate_settings();
+	create_sockets();
 });
 
+// HANDLEBARS
 Handlebars.registerHelper('print_users', function(likesusers) {
 	const users = [];
 	for (let u of likesusers){
@@ -62,6 +27,8 @@ Handlebars.registerHelper('print_users', function(likesusers) {
 	}
 });
 
+
+// HOOKS
 Hooks.on('renderSidebarTab', (ev, html) => {
 	if (ev.tabName == "chat") {
 		//get the total of likes
@@ -209,10 +176,8 @@ Hooks.on("renderChatMessage", async function(chatlog, html){
 		change_likes(chatlog, likes_new, "new");
 		likes = likes_new;	
 	}
-	else {
-		if (likes.users.includes(game.user.id)) {
-			liked = true;
-		}
+	else if (likes.users.includes(game.user.id)) {
+		liked = true;
 	}
 
 	const like_menu = "modules/likes-on-chat/templates/like-on-message.html";
@@ -224,13 +189,8 @@ Hooks.on("renderChatMessage", async function(chatlog, html){
 	};
 	const like_menu_html = await renderTemplate(like_menu, data);
 	html.append(like_menu_html);
-
-	addChatListeners(html);
-})
-
-function addChatListeners(html) {
 	html.on('click', 'a.like-button', doLikeButton)
-}
+})
 
 async function doLikeButton (ev) {
 	const gm_users = game.users.filter((u) => u.active && u.isGM).length;
@@ -238,54 +198,71 @@ async function doLikeButton (ev) {
     return ui.notifications.warn(`Could not give likes because there is no GM connected.`);
   }
 
+  //message data
 	const dataset = ev.currentTarget.dataset;
 	const id = dataset.id;
 	const message = game.messages.get(id);
-	const user = game.user.id
+
+	//original user data
 	const og_user_id = message.data.user;
+	const og_user = game.users.get(og_user_id);
+
+	if (game.settings.get("likes-on-chat", "auto_like") != "a" &&
+		og_user_id == user_id) {
+		return;
+	}
+
+	if (og_user == undefined){
+		return ui.notifications.warn("Original user does not exist");
+	}
+
+	//actual user data
+	const user_id = game.user.id;
+	const user = game.users.get(user_id);
+	const character = og_user.data?.character;
+
+	//likes data from message
 	const likes = message.getFlag("world", "likes");
+
 	let operation;
+	if (likes.users.includes(user_id)) {
+		operation = "sustract";
+	}
+	else {
+		operation = "add";
+	}
+		
+	//if adding likes, check the time
+	if (operation == "add") {
+		const last_like = user.getFlag("world", "last_like");
 
-	if (game.settings.get("likes-on-chat", "auto_like") == "a" || message.data.user != user) {
-		//find original user and check if it has a character
-		const og_user = game.users.filter(u => u.data._id == og_user_id );
-		let character;
+		if (last_like) {
+			const time_since = Math.floor((Date.now() - last_like)/1000);
+			const min_time = game.settings.get("likes-on-chat", "time_per_like")
 
-		if (og_user.length > 0){
-			character = og_user[0].data.character;
+			if (time_since < min_time){
+				return ui.notifications.warn("You need to wait before giving another like")
+			}
 		}
 		
-		//change the color of button
-		$(ev.currentTarget)[0].classList.toggle("liked");
-
-		//add or remove likes
-		if (likes.users.includes(user)) {
-			$(ev.currentTarget).removeClass("liked");
-			likes.total = likes.total - 1;
-			likes.users = likes.users.filter(u => u != user)
-			operation = "sustract";
-		}
-		else {
-			$(ev.currentTarget).addClass("liked")
-			likes.total = likes.total + 1;
-			likes.users.push(game.user.data._id)
-			operation = "add";
-		}
-
-		//push the change to the message
-		change_likes(message, likes, operation, character);
+		user.setFlag("world", "last_like", Date.now())
 	}
+
+	//push the change to the message
+	change_likes(message, likes, operation, character, ev);
 }
 
 
 //change the likes directly if it is GM
 //otherwise it calls a socket
 //then it changes the resource of the character
-function change_likes(message, likes, operation, character) {
+function change_likes(message, likes, operation, character, ev) {
 
 	if (operation != "new") {
 		const og_user_id = message.data.user;
 		const og_user = game.users.get(og_user_id);
+		const user_id = game.user.id;
+
 		let likes_res = og_user.getFlag("world", "likes")
 		if (likes_res == undefined) {
 			likes_res = {
@@ -296,10 +273,17 @@ function change_likes(message, likes, operation, character) {
 		else if (operation == "add") {
 			likes_res.value += 1;
 			likes_res.max += 1;
+			$(ev.currentTarget).addClass("liked");
+			likes.total += 1;
+			likes.users.push(user_id);
+			//show_likes_to_everyone();
 		}
 		else if (operation == "sustract") {
 			likes_res.value -= 1;
 			likes_res.max -= 1;
+			$(ev.currentTarget).removeClass("liked");
+			likes.total -= 1;
+			likes.users = likes.users.filter(u => u != user_id);
 		}		
 
 		if (game.user.isGM) {
@@ -328,28 +312,8 @@ function change_likes(message, likes, operation, character) {
 			likes: likes
 		});
 	}
-}
 
-//handle change likes
-//when the user is not the gm
-function handle_change_chat (data) {
-	if (!game.user.isGM) return;
-	const message = game.messages.get(data.message._id);
-	message.setFlag("world", "likes", data.likes);
-}
-
-//handle change in user
-function handle_change_user (data) {
-	if (!game.user.isGM) return;
-	const og_user = game.users.get(data.og_user_id);
-	og_user.setFlag("world", "likes", data.likes);
-}
-
-//handle change in actor
-function handle_change_actor (data) {
-	if (!game.user.isGM) return;
-	const actor = game.actors.get(data.actor_id);
-	actor.update({[data.attribute]: data.value});
+	return true;
 }
 
 function change_resource_of_actor (likes, character) {
@@ -400,3 +364,17 @@ function change_resource_of_actor (likes, character) {
 		});
 	}
 }
+
+// async function show_likes_to_everyone () {
+// 	const path = "modules/likes-on-chat/templates/like-card.html";
+// 	const data = {
+// 	};
+// 	const message = await renderTemplate(path, data);
+// 	const message_object = $(message);
+
+// 	const board = document.querySelector("body")
+// 	$(board).append(message_object);
+// 	setTimeout(function() {
+// 		message_object.remove();
+// 	}, 2000)
+// }
