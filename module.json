@@ -10,5 +10,8 @@
     "js/main.js"
   ],
   "socket": true,
-  "styles": ["css/likes.css"]
+  "styles": ["css/likes.css"],
+  "url": "https://github.com/wonderfulrabbit/likes-on-chat",
+  "manifest": "https://github.com/wonderfulrabbit/likes-on-chat/raw/master/src/module.json",
+  "download": "https://github.com/wonderfulrabbit/likes-on-chat/raw/master/dist/likes-on-chat.zip",
 }
