@@ -1,0 +1,17 @@
+<section>
+  <h2 style="text-align: center; font-size: 15px;">
+    {{title}}
+  </h2>
+
+  <div class="config-box center">
+    {{#each tags as |tag|}}
+      <label class="tag">
+        {{tag.name}}
+      </label>
+    {{/each}}
+  </div>
+
+  <p style="text-align: center;">
+    {{{text}}}
+  </p>
+</section>

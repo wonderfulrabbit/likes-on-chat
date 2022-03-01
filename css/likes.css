@@ -1,0 +1,114 @@
+.f-h{
+	display: flex;
+	gap: 8px;
+}
+
+.f-end{
+	justify-content: end;
+}
+
+.f-a-center{
+	align-items: center;
+}
+
+.f-sp-0{
+	flex: 0;
+}
+
+.f-sp-1{
+	flex: 1;
+}
+
+.padding-s{
+	padding: 4px;
+}
+
+.margin-ss{
+	margin: 4px;
+	width: auto;
+}
+
+.margin-s-b{
+	margin-bottom: 8px;
+}
+
+.border-a{
+	border: 1px solid black;
+}
+
+.border-r-s{
+	border-radius: 8px;
+}
+
+.liked{
+	color: blue;
+	border-color: blue;
+}
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 160px;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -160px;
+
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 150px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.text-nw{
+	white-space: nowrap;
+}
+
+.config-box{
+  display: flex;
+  justify-content: start;
+  align-items: center; 
+  gap:15px;
+}
+
+.config-box.wide{
+  height: 2em;
+  margin: 7px 2px;
+}
+
+.config-box.center{
+  justify-content: center;
+}
+
+.tag{
+  padding: 5px;
+  background-color: crimson;
+  color: white;
+  border-radius: 5px
+}

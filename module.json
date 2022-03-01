@@ -1,0 +1,14 @@
+{
+  "name": "likes-on-chat",
+  "title": "Likes on Chat",
+  "description": "A simple module to give likes inside chat",
+  "author": "Owen",
+  "version": "1.0.0",
+  "minimumCoreVersion": "0.8.6",
+  "compatibleCoreVersion": "9",
+  "esmodules": [
+    "js/main.js"
+  ],
+  "socket": true,
+  "styles": ["css/likes.css"]
+}
