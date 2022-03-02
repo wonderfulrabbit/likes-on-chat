@@ -20,19 +20,24 @@
 	width: 500px;
 	height: 200px;
 	overflow: hidden;
-	animation: anime 1s 0s;
 }
 
-@keyframes anime {
-	0% {
-		width: 0px;
-		height: 200px;
-	}
-	100% {
-		width: 500px;
-		height: 200px;
-	}
-}	
+.vibrate {
+	animation: animate 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+@keyframes animate {
+  0% {
+    -webkit-transform: translateZ(-1400px) translateX(1000px);
+            transform: translateZ(-1400px) translateX(1000px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateZ(0) translateX(0);
+            transform: translateZ(0) translateX(0);
+    opacity: 1;
+  }
+}
 
 .message-box .title{
 	overflow: hidden;
@@ -101,6 +106,10 @@
 	margin-bottom: 8px;
 }
 
+.margin-ss-r{
+	margin-right: 4px;
+}
+
 .border-a{
 	border: 1px solid black;
 }
@@ -111,7 +120,6 @@
 
 .liked{
 	color: blue;
-	border-color: blue;
 }
 
 

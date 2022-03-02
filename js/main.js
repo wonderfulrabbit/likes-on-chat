@@ -1,5 +1,6 @@
 import { populate_settings } from "./settings.js";
 import { create_sockets } from "./sockets.js";
+import { show_likes } from "./displaylikes.js";
 
 Hooks.once('init', () => {
 	populate_settings();
@@ -262,6 +263,7 @@ function change_likes(message, likes, operation, character, ev) {
 		const og_user_id = message.data.user;
 		const og_user = game.users.get(og_user_id);
 		const user_id = game.user.id;
+		const user = game.users.get(user_id);
 
 		let likes_res = og_user.getFlag("world", "likes")
 		if (likes_res == undefined) {
@@ -276,7 +278,15 @@ function change_likes(message, likes, operation, character, ev) {
 			$(ev.currentTarget).addClass("liked");
 			likes.total += 1;
 			likes.users.push(user_id);
-			//show_likes_to_everyone();
+			if (likes.total > 1) {
+				show_likes(likes.total, og_user.data.name, user.data.name);	
+				game.socket.emit('module.likes-on-chat', {
+					operation: "show-likes",
+					num_likes: likes.total, 
+					user1: og_user.data.name, 
+					user2: user.data.name
+				});
+			}
 		}
 		else if (operation == "sustract") {
 			likes_res.value -= 1;
@@ -365,16 +375,3 @@ function change_resource_of_actor (likes, character) {
 	}
 }
 
-// async function show_likes_to_everyone () {
-// 	const path = "modules/likes-on-chat/templates/like-card.html";
-// 	const data = {
-// 	};
-// 	const message = await renderTemplate(path, data);
-// 	const message_object = $(message);
-
-// 	const board = document.querySelector("body")
-// 	$(board).append(message_object);
-// 	setTimeout(function() {
-// 		message_object.remove();
-// 	}, 2000)
-// }
