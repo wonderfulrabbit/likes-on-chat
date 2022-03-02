@@ -28,6 +28,10 @@ Handlebars.registerHelper('print_users', function(likesusers) {
 	}
 });
 
+Handlebars.registerHelper('ifEqualorMore', function(arg1, arg2, options) {
+  return (arg1 >= arg2) ? options.fn(this) : options.inverse(this);
+});
+
 
 // HOOKS
 Hooks.on('renderSidebarTab', (ev, html) => {
@@ -278,7 +282,7 @@ function change_likes(message, likes, operation, character, ev) {
 			$(ev.currentTarget).addClass("liked");
 			likes.total += 1;
 			likes.users.push(user_id);
-			if (likes.total > 1) {
+			if (likes.total > 0) {
 				show_likes(likes.total, og_user.data.name, user.data.name);	
 				game.socket.emit('module.likes-on-chat', {
 					operation: "show-likes",
