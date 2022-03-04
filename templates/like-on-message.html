@@ -1,6 +1,13 @@
 <div class="f-h f-end">
-	<a class="tooltip like-button padding-s {{#if liked}}liked{{/if}}" data-id="{{id}}">
-		<i class="fas fa-thumbs-up  margin-ss-r"></i> {{likes}}
+	
+	<div class="menu-container">
+		<a class="circular-small like-show" data-id="{{id}}" data-bar="hiding">
+			<i class="fas fa-thumbs-up {{#if liked}}liked{{/if}}"></i>
+		</a>
+	</div> 
+
+	<div class="tooltip">
+		{{likes}}
 		<span class="tooltiptext">{{print_users users}}</span>
-	</a>
+	</div>
 </div>

@@ -64,7 +64,7 @@
 
 .f-h{
 	display: flex;
-	gap: 8px;
+	gap: 6px;
 }
 
 .f-v{
@@ -94,20 +94,20 @@
 }
 
 .padding-s{
-	padding: 4px;
+	padding: 3px;
 }
 
 .margin-ss{
-	margin: 4px;
+	margin: 3px;
 	width: auto;
 }
 
 .margin-s-b{
-	margin-bottom: 8px;
+	margin-bottom: 6px;
 }
 
 .margin-ss-r{
-	margin-right: 4px;
+	margin-right: 3px;
 }
 
 .border-a{
@@ -115,7 +115,7 @@
 }
 
 .border-r-s{
-	border-radius: 8px;
+	border-radius: 6px;
 }
 
 .liked{
@@ -125,7 +125,9 @@
 
 .tooltip {
   position: relative;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .tooltip .tooltiptext {
@@ -139,9 +141,9 @@
 
   position: absolute;
   z-index: 1;
-  bottom: 125%;
+  bottom: 100%;
   left: 50%;
-  margin-left: -160px;
+  margin-left: -152px;
 
   opacity: 0;
   transition: opacity 0.3s;
@@ -162,6 +164,45 @@
   visibility: visible;
   opacity: 1;
 }
+
+
+.menu-container {
+  position: relative;
+}
+
+.menu-container .floatingmenu {
+  text-align: center;
+  border-radius: 15px;
+
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  right: 0px;
+
+  padding: 3px;
+  background: gray;
+}
+
+.show {
+	visibility: visible !important;
+}
+
+.like-show {
+	margin: 3px;
+	position: relative;
+	z-index: 2;
+}
+
+.circular-small{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: white;
+}
+
 
 .text-nw{
 	white-space: nowrap;

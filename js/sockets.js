@@ -1,4 +1,4 @@
-import { show_likes } from "./displaylikes.js";
+import { show_likes } from "./display-likes.js";
 
 export function create_sockets(){
 	console.log("creating sockets...");
