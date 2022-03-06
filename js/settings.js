@@ -48,4 +48,17 @@ export function populate_settings() {
 	  },
 	  default: 5
 	});
+
+	game.settings.register("likes-on-chat", "message_size", {
+	  name: "Size of message",
+	  scope: "world",
+	  config: true,
+	  type: Number,
+	  range: {             
+	    min: 5,
+	    max: 50,
+	    step: 5
+	  },
+	  default: 30
+	});
 }

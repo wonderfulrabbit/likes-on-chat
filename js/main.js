@@ -2,7 +2,8 @@ import { populate_settings } from "./settings.js";
 import { populate_handlebars } from "./handlebars.js";
 import { create_sockets } from "./sockets.js";
 import { spend_likes_menu } from "./spend-likes.js";
-import { change_likes, change_resource_of_actor } from "./changes.js"
+import GmMenu from "./gm-likes.js";
+import { change_likes, change_resource_of_actor } from "./changes.js";
 
 
 Hooks.once('init', () => {
@@ -14,20 +15,36 @@ Hooks.once('init', () => {
 
 Hooks.once("ready", () => {
 	const user = game.users.get(game.user.id);
-	user.setFlag("world", "max_likes", 5);
+	//user.setFlag("world", "max_likes", 5);
 })
 
-// Add button to spend likes
+// Add buttons
 Hooks.on('renderSidebarTab', (ev, html) => {
 	if (ev.tabName == "chat") {
-		const spend_likes_button = $('<button class="f-sp-0 margin-ss">')
+		const container = $('<div class="f-h margin-ss f-sp-0">')
+
+		const spend_likes_button = $('<button class="f-sp-1">')
     .append(
       $('<i class="fas fa-thumbs-up"></i>'),
-      document.createTextNode(`Likes`)
+      document.createTextNode(`Spend Likes`)
     );
 
-    html.prepend(spend_likes_button);
-		spend_likes_button.on('click', (ev) => spend_likes_menu(ev));
+    container.append(spend_likes_button);
+    spend_likes_button.on('click', (ev) => spend_likes_menu(ev));
+
+
+		if (game.user.isGM) {
+			const gm_likes_button = $('<button class="f-sp-1">')
+	    .append(
+	      $('<i class="fas fa-thumbs-up"></i>'),
+	      document.createTextNode(`Gm menu`)
+	    );
+
+	    container.append(gm_likes_button);
+	    gm_likes_button.on('click', (ev) => new GmMenu().render(true));
+	  }
+
+    html.prepend(container);
 	}
 });
 
@@ -51,16 +68,27 @@ Hooks.on("renderChatMessage", async function(chatlog, html){
 	const like_menu_html = await renderTemplate(like_menu, data);
 	html.append(like_menu_html);
 	
-	html.on('click', 'a.like-show', doShowBar)
-	html.on('click', 'a.like-button', doLikeButton)
+	html.on('click', 'a.like-show', doShowBar);
+	html.on('click', 'a.like-button', doLikeButton);
 })
 
+
+
+let last_target;
 async function doShowBar (ev) {
 	const target = ev.currentTarget
 	const dataset = target.dataset;
+	const user = game.users.get(game.user.id);
+	const max_of_likes = await user.getFlag("world", "max_likes");
 
 	if (dataset.bar == "hiding") {
-		const user = game.users.get(game.user.id);
+		if (last_target) {
+			$(last_target).next().remove();
+			last_target.dataset.bar = "hiding";
+		}
+
+		last_target = target;
+
 		const max_of_likes = await user.getFlag("world", "max_likes");
 		const like_options = Array(max_of_likes).fill().map((_, i) => max_of_likes-i)
 		
@@ -77,6 +105,7 @@ async function doShowBar (ev) {
 	}
 	else {
 		$(target).next().remove();
+		last_target = undefined;
 		dataset.bar = "hiding";
 	}
 }

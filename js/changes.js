@@ -7,18 +7,36 @@ export function change_likes(message, target) {
 	const character = og_user.data?.character;
 	const user_id = game.user.id;
 	const user = game.users.get(user_id);
-	const num_likes = target.innerHTML;
+	const num_likes = parseInt(target.innerHTML);
 
 	const likes_on_message = 
 		message.getFlag("world", "likes") ?? {total: 0, users: []}
 	const likes_on_user = 
 		og_user.getFlag("world", "likes") ?? { value: 0, max: 0 }
 
-	likes_on_user.value = parseInt(likes_on_user.value) + parseInt(num_likes);
-	likes_on_user.max = parseInt(likes_on_user.max) + parseInt(num_likes);
+	if (user.getFlag("world", "max_likes") < num_likes) {
+		return ui.notifications.warn("You don't have that many likes to give");
+	}
+
+	likes_on_user.value = parseInt(likes_on_user.value) + num_likes;
+	likes_on_user.max = parseInt(likes_on_user.max) + num_likes;
 	$(target).addClass("liked");
-	likes_on_message.total = parseInt(likes_on_message.total) + parseInt(num_likes);
-	likes_on_message.users.push(user_id);
+	likes_on_message.total = parseInt(likes_on_message.total) + num_likes;
+	
+	let new_user = true;
+	for (let u of likes_on_message.users) {
+		if (u.id == user_id) {
+			new_user = false;
+			u.ammount = parseInt(u.ammount) + num_likes; 
+		}
+	}
+	if (new_user) {
+		const user = {
+			id: user_id,
+			ammount: num_likes
+		}
+		likes_on_message.users.push(user);
+	}
 
 	show_likes(num_likes, og_user.data.name, user.data.name);	
 	game.socket.emit('module.likes-on-chat', {
@@ -49,7 +67,7 @@ export function change_likes(message, target) {
 		game.socket.emit('module.likes-on-chat', {
 			operation: "change-likes-chat",
 			message: message,
-			likes: likes
+			likes: likes_on_message
 		});
 	}
 }

@@ -1,0 +1,28 @@
+<form class="f-v">
+	<div class="f-v">
+		<h2>Edit likes of players</h2>
+		{{#each users}}
+		<div class="f-h f-a-center">
+			<label>{{name}}: </label>
+			<input type="number" name="{{id}}.like.value" value="{{like.value}}" class="width-s"/>
+			<label>/</label>
+			<input type="number" name="{{id}}.like.max" value="{{like.max}}" class="width-s"/>
+		</div>
+		{{/each}}
+		<button type="save" name="save">Save</button>
+	</div>
+	
+	<div class="f-v">
+		<h2>Add likes to give</h2>
+		<div class="f-h f-a-center">
+			<label>Ammount: </label>
+			<input type="number" name="add_likes" value="0" class="width-s"/>
+		</div>
+		<button type="add" name="add">Add</button>
+		{{#each users}}
+		<div class="f-h f-a-center">
+			<label>{{name}} likes left: {{max_likes}}</label>
+		</div>
+		{{/each}}
+	</div>
+</form>
