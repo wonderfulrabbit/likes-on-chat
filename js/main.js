@@ -1,8 +1,10 @@
 import { populate_settings } from "./settings.js";
 import { populate_handlebars } from "./handlebars.js";
 import { create_sockets } from "./sockets.js";
+import { give_likes_menu } from "./give-likes.js";
 import { spend_likes_menu } from "./spend-likes.js";
 import GmMenu from "./gm-likes.js";
+import { youtube_menu } from "./youtube.js";
 import { change_likes, change_resource_of_actor } from "./changes.js";
 
 
@@ -21,30 +23,49 @@ Hooks.once("ready", () => {
 // Add buttons
 Hooks.on('renderSidebarTab', (ev, html) => {
 	if (ev.tabName == "chat") {
-		const container = $('<div class="f-h margin-ss f-sp-0">')
+		const container = $('<div class="f-h margin-ss f-sp-0">');
 
-		const spend_likes_button = $('<button class="f-sp-1">')
+		const give_likes_button = $('<button class="f-sp-1">')
+    .append(
+      $('<i class="fas fa-thumbs-up"></i>'),
+      document.createTextNode(`Give Likes`)
+    );
+
+    const spend_likes_button = $('<button class="f-sp-1">')
     .append(
       $('<i class="fas fa-thumbs-up"></i>'),
       document.createTextNode(`Spend Likes`)
     );
 
+    container.append(give_likes_button);
     container.append(spend_likes_button);
+    give_likes_button.on('click', (ev) => give_likes_menu(ev));
     spend_likes_button.on('click', (ev) => spend_likes_menu(ev));
+    html.prepend(container);
 
 
 		if (game.user.isGM) {
+			const container2 = $('<div class="f-h margin-ss f-sp-0">');
+
 			const gm_likes_button = $('<button class="f-sp-1">')
 	    .append(
 	      $('<i class="fas fa-thumbs-up"></i>'),
 	      document.createTextNode(`Gm menu`)
 	    );
+	    const youtube_button = $('<button class="f-sp-1">')
+	    .append(
+	      $('<i class="fas fa-thumbs-up"></i>'),
+	      document.createTextNode(`Youtube`)
+	    );
 
-	    container.append(gm_likes_button);
+	    container2.append(gm_likes_button);
+	    container2.append(youtube_button);
 	    gm_likes_button.on('click', (ev) => new GmMenu().render(true));
+	    youtube_button.on('click', (ev) => youtube_menu(ev));
+	    html.prepend(container2);
 	  }
 
-    html.prepend(container);
+    
 	}
 });
 
@@ -90,7 +111,8 @@ async function doShowBar (ev) {
 		last_target = target;
 
 		const max_of_likes = await user.getFlag("world", "max_likes");
-		const like_options = Array(max_of_likes).fill().map((_, i) => max_of_likes-i)
+		const likes_on_bar = Math.min(5, max_of_likes);
+		const like_options = Array(likes_on_bar).fill().map((_, i) => likes_on_bar-i)
 		
 		const like_bar = "modules/likes-on-chat/templates/like-bar.html";
 		const data = await {

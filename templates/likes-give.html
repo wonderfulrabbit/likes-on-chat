@@ -1,0 +1,18 @@
+<h2>Online Users</h2>
+
+
+{{#each users}}
+<div>
+	<input type="radio" id="{{id}}" name="users" value="{{id}}" 
+	{{#if @first}}checked{{/if}}>
+	<label for="{{id}}">{{name}}</label>
+</div>
+{{/each}}
+
+<h2>Number of likes</h2>
+
+<select name="likes" id="likes">
+	{{#each likes}}
+  <option value="{{this}}">{{this}}</option>
+  {{/each}}
+</select>

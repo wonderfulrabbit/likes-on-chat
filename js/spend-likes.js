@@ -17,7 +17,7 @@ export async function spend_likes_menu (ev) {
 	);
 	
 	const dialogConfig = {
-		title: "Change likes",
+		title: "Spend Likes",
     content: html,
     buttons: {
     	spend: {

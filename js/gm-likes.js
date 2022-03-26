@@ -50,11 +50,10 @@ export default class GmMenu extends FormApplication {
     addEventListener('click', async () => {
     	const typeObject = foundry.utils.expandObject(this._getSubmitData());
     	const add_likes = typeObject.add_likes;
-    	const min_likes = 5;
 
     	for (let u of game.users) {
     		const max_likes = u.getFlag("world", "max_likes")??0;
-    		u.setFlag("world", "max_likes", Math.min(max_likes + add_likes, min_likes));
+    		u.setFlag("world", "max_likes", max_likes + add_likes);
     	}
     });
   }

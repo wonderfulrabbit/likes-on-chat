@@ -11,6 +11,8 @@ export function change_likes(message, target) {
 
 	const likes_on_message = 
 		message.getFlag("world", "likes") ?? {total: 0, users: []}
+
+
 	const likes_on_user = 
 		og_user.getFlag("world", "likes") ?? { value: 0, max: 0 }
 
@@ -72,7 +74,42 @@ export function change_likes(message, target) {
 	}
 }
 
+export function add_likes (n, user){
+	const author = game.users.get(game.user.id);
+	const user_likes = 
+		user.getFlag("world", "likes") ?? { value: 0, max: 0 }
 
+	user_likes.value = parseInt(user_likes.value) + n;
+	user_likes.max = parseInt(user_likes.max) + n;
+
+	show_likes(n, user.data.name, author.data.name);	
+	game.socket.emit('module.likes-on-chat', {
+		operation: "show-likes",
+		num_likes: n, 
+		user1: user.data.name, 
+		user2: author.data.name
+	});
+
+	if (game.settings.get("likes-on-chat", "change_resource_of_actor") == "a") {
+	  const character = user.data?.character;
+	  change_resource_of_actor(user_likes, character);
+	} 
+
+	const max_likes = author.getFlag("world", "max_likes");
+	author.setFlag("world", "max_likes", max_likes - n)
+
+	if (game.user.isGM) {
+		user.setFlag("world", "likes", user_likes);
+	}
+	else {		
+		game.socket.emit('module.likes-on-chat', {
+			operation: "change-likes-user",
+			og_user_id: user,
+			likes: user_likes
+		});
+	}
+
+}
 
 export function change_resource_of_actor (likes, character) {
 	const actor_char = game.actors.get(character);
